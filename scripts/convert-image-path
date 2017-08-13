@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function global2local() {
+function global2local {
   GLOBAL_PATH=$1
   LOCAL_ROOT=$2
   # Split by path
@@ -13,7 +13,7 @@ function global2local() {
   echo ${LOCAL_PATH}
 }
 
-function local2global() {
+function local2global {
   LOCAL_PATH=$1
   # Split by path
   IFS='/' read -ra A_ABSOLUTE_PATH <<< "$LOCAL_PATH"
@@ -25,7 +25,7 @@ function local2global() {
   echo ${GLOBAL_PATH}
 }
 
-function push-global-to-local() {
+function push-global-to-local {
   GLOBAL_PATH=$1
   LOCAL_ROOT=$2
   docker pull ${GLOBAL_PATH}
@@ -35,7 +35,7 @@ function push-global-to-local() {
   echo "${GLOBAL_PATH} pushed to ${LOCAL_PATH}!"
 }
 
-function pull-global-from-local() {
+function pull-global-from-local {
   LOCAL_PATH=$1
   docker pull ${LOCAL_PATH}
   GLOBAL_PATH=$(local2global $1)
@@ -43,7 +43,7 @@ function pull-global-from-local() {
   echo "${GLOBAL_PATH} pulled from ${LOCAL_PATH}!"
 }
 
-function usage() {
+function usage {
   echo "convert-image-path global <global-path> <local-root>"
   echo "convert-image-path local <local-path>"
   echo "convert-image-path push <global-path> <local-root>"
@@ -52,13 +52,13 @@ function usage() {
 
 SUBCOMMAND=$1
 if [ "$SUBCOMMAND" = "global" ]; then
-  printf "$(global2local $2 $3)\n"
+  global2local $2 $3
 elif [ "$SUBCOMMAND" = "local" ]; then
-  printf "$(local2global $2)\n"
+  local2global $2
 elif [ "$SUBCOMMAND" = "push" ]; then
-  printf "$(push-global-to-local $2 $3)\n"
+  push-global-to-local $2 $3
 elif [ "$SUBCOMMAND" = "pull" ]; then
-  printf "$(pull-global-from-local $2)\n"
+  pull-global-from-local $2
 else
-  printf "$(usage)\n"
+  usage
 fi
