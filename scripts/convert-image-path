@@ -1,0 +1,65 @@
+#!/bin/bash
+
+function global2local() {
+  GLOBAL_PATH=$1
+  LOCAL_ROOT=$2
+  # Split by path
+  IFS='/' read -ra A_PATH <<< "$GLOBAL_PATH"
+  GLOBAL_ROOT=${A_PATH[0]}
+  LOCAL_PATH=${LOCAL_ROOT}/$(sed 's/\./_/' <<< ${A_PATH[0]})
+  for i in {1..2}; do
+      LOCAL_PATH=${LOCAL_PATH}__${A_PATH[$i]}
+  done
+  echo ${LOCAL_PATH}
+}
+
+function local2global() {
+  LOCAL_PATH=$1
+  # Split by path
+  IFS='/' read -ra A_ABSOLUTE_PATH <<< "$LOCAL_PATH"
+  LOCAL_RELATIVE_PATH=${A_ABSOLUTE_PATH[1]}
+  GLOBAL_PATH=$(sed 's/__/\//g' <<< ${LOCAL_RELATIVE_PATH})
+  IFS='/' read -ra A_PATH <<< "${GLOBAL_PATH}"
+  GLOBAL_ROOT=$(sed 's/_/\./' <<< ${A_PATH[0]})
+  GLOBAL_PATH=$(sed "s/${A_PATH[0]}/${GLOBAL_ROOT}/" <<< ${GLOBAL_PATH})
+  echo ${GLOBAL_PATH}
+}
+
+function push-global-to-local() {
+  GLOBAL_PATH=$1
+  LOCAL_ROOT=$2
+  docker pull ${GLOBAL_PATH}
+  LOCAL_PATH=$(global2local $1 $2)
+  docker tag ${GLOBAL_PATH} ${LOCAL_PATH}
+  docker push ${LOCAL_PATH}
+  echo "${GLOBAL_PATH} pushed to ${LOCAL_PATH}!"
+}
+
+function pull-global-from-local() {
+  LOCAL_PATH=$1
+  docker pull ${LOCAL_PATH}
+  GLOBAL_PATH=$(local2global $1)
+  docker tag ${LOCAL_PATH} ${GLOBAL_PATH}
+  echo "${GLOBAL_PATH} pulled from ${LOCAL_PATH}!"
+}
+
+function usage() {
+  echo "convert-image-path global <global-path> <local-root>"
+  echo "convert-image-path local <local-path>"
+  echo "convert-image-path push <global-path> <local-root>"
+  echo "convert-image-path pull <local-path>"
+  echo " "
+}
+
+SUBCOMMAND=$1
+if [ "$SUBCOMMAND" = "global" ]; then
+  printf "$(global2local $2 $3)"
+elif [ "$SUBCOMMAND" = "local" ]; then
+  printf "$(local2global $2)"
+elif [ "$SUBCOMMAND" = "push" ]; then
+  printf "$(push-global-to-local $2 $3)"
+elif [ "$SUBCOMMAND" = "pull" ]; then
+  printf "$(pull-global-from-local $2)"
+else
+  printf "$(usage)"
+fi
