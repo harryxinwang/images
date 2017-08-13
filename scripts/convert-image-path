@@ -8,7 +8,7 @@ function global2local() {
   GLOBAL_ROOT=${A_PATH[0]}
   LOCAL_PATH=${LOCAL_ROOT}/$(sed 's/\./_/' <<< ${A_PATH[0]})
   for i in {1..2}; do
-      LOCAL_PATH=${LOCAL_PATH}__${A_PATH[$i]}
+      LOCAL_PATH=${LOCAL_PATH}x_x${A_PATH[$i]}
   done
   echo ${LOCAL_PATH}
 }
@@ -18,7 +18,7 @@ function local2global() {
   # Split by path
   IFS='/' read -ra A_ABSOLUTE_PATH <<< "$LOCAL_PATH"
   LOCAL_RELATIVE_PATH=${A_ABSOLUTE_PATH[1]}
-  GLOBAL_PATH=$(sed 's/__/\//g' <<< ${LOCAL_RELATIVE_PATH})
+  GLOBAL_PATH=$(sed 's/x_x/\//g' <<< ${LOCAL_RELATIVE_PATH})
   IFS='/' read -ra A_PATH <<< "${GLOBAL_PATH}"
   GLOBAL_ROOT=$(sed 's/_/\./' <<< ${A_PATH[0]})
   GLOBAL_PATH=$(sed "s/${A_PATH[0]}/${GLOBAL_ROOT}/" <<< ${GLOBAL_PATH})
@@ -48,18 +48,17 @@ function usage() {
   echo "convert-image-path local <local-path>"
   echo "convert-image-path push <global-path> <local-root>"
   echo "convert-image-path pull <local-path>"
-  echo " "
 }
 
 SUBCOMMAND=$1
 if [ "$SUBCOMMAND" = "global" ]; then
-  printf "$(global2local $2 $3)"
+  printf "$(global2local $2 $3)\n"
 elif [ "$SUBCOMMAND" = "local" ]; then
-  printf "$(local2global $2)"
+  printf "$(local2global $2)\n"
 elif [ "$SUBCOMMAND" = "push" ]; then
-  printf "$(push-global-to-local $2 $3)"
+  printf "$(push-global-to-local $2 $3)\n"
 elif [ "$SUBCOMMAND" = "pull" ]; then
-  printf "$(pull-global-from-local $2)"
+  printf "$(pull-global-from-local $2)\n"
 else
-  printf "$(usage)"
+  printf "$(usage)\n"
 fi
