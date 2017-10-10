@@ -52,14 +52,14 @@ function pull-all-images() {
 }
 
 function usage {
-  echo "push"
-  echo "pull"
+  echo "fetch-kube-images.sh push"
+  echo "fetch-kube-images.sh pull"
 }
 
 SUBCOMMAND=$1
-if [ "$SUBCOMMAND" = "fetch-kube-images.sh push" ]; then
+if [ "$SUBCOMMAND" = "push" ]; then
   push-all-images ${@:2}
-elif [ "$SUBCOMMAND" = "fetch-kube-images.sh pull" ]; then
+elif [ "$SUBCOMMAND" = "pull" ]; then
   pull-all-images ${@:2}
 else
   usage
