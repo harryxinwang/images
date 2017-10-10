@@ -57,9 +57,9 @@ function usage {
 }
 
 SUBCOMMAND=$1
-if [ "$SUBCOMMAND" = "push" ]; then
+if [ "$SUBCOMMAND" = "fetch-kube-images.sh push" ]; then
   push-all-images ${@:2}
-elif [ "$SUBCOMMAND" = "pull" ]; then
+elif [ "$SUBCOMMAND" = "fetch-kube-images.sh pull" ]; then
   pull-all-images ${@:2}
 else
   usage
