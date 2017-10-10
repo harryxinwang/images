@@ -42,7 +42,7 @@ function pull-etcd-images() {
 }
 
 function push-all-images() {
-  push-master-images 1.8.0
+  push-master-images v1.8.0
   push-etcd-images 3.0.17
 }
 
